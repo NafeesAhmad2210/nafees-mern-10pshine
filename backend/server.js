@@ -1,4 +1,10 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '.env') });
+
 import dns from 'dns';
 dns.setDefaultResultOrder('ipv4first');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -6,6 +12,7 @@ import express from 'express';
 import cors from 'cors';
 import { connectDB } from './src/config/db.js';
 import authRoutes from './src/routes/auth.js';
+import notesRoutes from './src/routes/notes.js';
 import logger from './src/logger.js';
 
 const app = express();
@@ -20,6 +27,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/notes', notesRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
