@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ensure text is written left-to-right like English in note editors */
+.rich-editor {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Ensure lists inside our rich-text editors actually show bullets/numbers */
+.rich-editor ul {
+  list-style-type: disc;
+  margin-left: 1.25rem;
+}
+
+.rich-editor ol {
+  list-style-type: decimal;
+  margin-left: 1.25rem;
+}
