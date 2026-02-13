@@ -12,7 +12,7 @@ export default function ImportantPage() {
     setLoading(true);
     try {
       const data = await getImportantNotes();
-      const list = Array.isArray(data) ? data : data?.notes ?? [];
+      const list = Array.isArray(data) ? data : (data?.notes ?? []);
       setNotes(list.filter((n) => !n.trashed));
     } catch {
       setNotes([]);
@@ -36,8 +36,8 @@ export default function ImportantPage() {
       if (updated.important) {
         setNotes((prev) =>
           prev.map((n) =>
-            idStr(n._id) === idStr(id) ? { ...n, ...updated } : n
-          )
+            idStr(n._id) === idStr(id) ? { ...n, ...updated } : n,
+          ),
         );
       }
     } catch {
@@ -60,8 +60,8 @@ export default function ImportantPage() {
       if (updated.important) {
         setNotes((prev) =>
           prev.map((n) =>
-            idStr(n._id) === idStr(id) ? { ...n, ...updated } : n
-          )
+            idStr(n._id) === idStr(id) ? { ...n, ...updated } : n,
+          ),
         );
       } else {
         setNotes((prev) => prev.filter((n) => idStr(n._id) !== idStr(id)));

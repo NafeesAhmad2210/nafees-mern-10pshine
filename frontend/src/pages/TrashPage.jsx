@@ -37,7 +37,11 @@ export default function TrashPage() {
   };
 
   const handleDeletePermanent = async (id) => {
-    if (!window.confirm("Are you sure you want to permanently delete this note? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to permanently delete this note? This action cannot be undone.",
+      )
+    ) {
       return;
     }
     setError("");

@@ -12,7 +12,7 @@ export default function CreateNotePage() {
     setLoading(true);
     try {
       const data = await getNotes();
-      const list = Array.isArray(data) ? data : data?.notes ?? [];
+      const list = Array.isArray(data) ? data : (data?.notes ?? []);
       setNotes(list.filter((n) => !n.trashed).slice(0, 3));
     } catch {
       setNotes([]);
@@ -42,7 +42,9 @@ export default function CreateNotePage() {
           + New note
         </button>
       </div>
-      <h2 className="text-lg font-semibold text-slate-200 mb-3">Recent notes</h2>
+      <h2 className="text-lg font-semibold text-slate-200 mb-3">
+        Recent notes
+      </h2>
       {loading ? (
         <p className="text-slate-400">Loading…</p>
       ) : notes.length === 0 ? (
