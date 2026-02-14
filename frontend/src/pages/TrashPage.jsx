@@ -10,7 +10,7 @@ export default function TrashPage() {
     setLoading(true);
     try {
       const data = await getTrashedNotes();
-      const list = Array.isArray(data) ? data : data?.notes ?? [];
+      const list = Array.isArray(data) ? data : (data?.notes ?? []);
       setNotes(list);
     } catch {
       setNotes([]);

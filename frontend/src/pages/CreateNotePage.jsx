@@ -12,7 +12,7 @@ export default function CreateNotePage() {
     setLoading(true);
     try {
       const data = await getNotes();
-      const list = Array.isArray(data) ? data : data?.notes ?? [];
+      const list = Array.isArray(data) ? data : (data?.notes ?? []);
       setNotes(list.filter((n) => !n.trashed).slice(0, 3));
     } catch {
       setNotes([]);
