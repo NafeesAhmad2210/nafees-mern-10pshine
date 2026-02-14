@@ -1,29 +1,31 @@
-import { useState, useEffect } from 'react';
-import NoteCard from '../components/NoteCard.jsx';
-import EditNoteModal from '../components/EditNoteModal.jsx';
-import { getImportantNotes, updateNote, trashNote } from '../api.js';
+import { useState, useEffect } from "react";
+import NoteCard from "../components/NoteCard.jsx";
+import EditNoteModal from "../components/EditNoteModal.jsx";
+import { getImportantNotes, updateNote, trashNote } from "../api.js";
 
 export default function ImportantPage() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [editingNote, setEditingNote] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      setError('');
+      setError("");
       try {
         const data = await getImportantNotes();
         if (!cancelled) setNotes(data);
       } catch (err) {
-        if (!cancelled) setError(err.message || 'Failed to load notes');
+        if (!cancelled) setError(err.message || "Failed to load notes");
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleToggleImportant = async (id, important) => {
@@ -42,7 +44,16 @@ export default function ImportantPage() {
       const idStr = String(id);
       setNotes((prev) => {
         if (!important) return prev.filter((n) => String(n._id) !== idStr);
-        return prev.map((n) => (String(n._id) === idStr ? { ...n, title: updated.title, content: updated.content ?? '', important: Boolean(updated.important) } : n));
+        return prev.map((n) =>
+          String(n._id) === idStr
+            ? {
+                ...n,
+                title: updated.title,
+                content: updated.content ?? "",
+                important: Boolean(updated.important),
+              }
+            : n,
+        );
       });
       setEditingNote(null);
     } catch (err) {
@@ -56,15 +67,31 @@ export default function ImportantPage() {
       <p className="text-slate-400 mb-6">All notes marked as important.</p>
       {loading && <p className="text-slate-400">Loading…</p>}
       {error && <p className="text-red-400 text-sm">{error}</p>}
-      {!loading && !error && notes.length === 0 && <p className="text-slate-400">No important notes yet. Mark a note as important when creating it.</p>}
+      {!loading && !error && notes.length === 0 && (
+        <p className="text-slate-400">
+          No important notes yet. Mark a note as important when creating it.
+        </p>
+      )}
       {!loading && notes.length > 0 && (
         <ul className="space-y-3 max-w-2xl">
           {notes.map((note) => (
-            <NoteCard key={note._id} note={note} onEdit={setEditingNote} onToggleImportant={handleToggleImportant} onTrash={handleTrash} showContentFull />
+            <NoteCard
+              key={note._id}
+              note={note}
+              onEdit={setEditingNote}
+              onToggleImportant={handleToggleImportant}
+              onTrash={handleTrash}
+              showContentFull
+            />
           ))}
         </ul>
       )}
-      <EditNoteModal isOpen={!!editingNote} note={editingNote} onClose={() => setEditingNote(null)} onSave={handleSaveEdit} />
+      <EditNoteModal
+        isOpen={!!editingNote}
+        note={editingNote}
+        onClose={() => setEditingNote(null)}
+        onSave={handleSaveEdit}
+      />
     </div>
   );
 }
