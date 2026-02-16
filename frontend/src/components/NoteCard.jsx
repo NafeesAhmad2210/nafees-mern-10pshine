@@ -1,3 +1,9 @@
+function toId(note) {
+  if (note == null) return "";
+  const id = note._id ?? note.id;
+  return id != null ? String(id) : "";
+}
+
 export default function NoteCard({
   note,
   onToggleImportant,
@@ -5,6 +11,7 @@ export default function NoteCard({
   onEdit,
   showContentFull,
 }) {
+  const id = toId(note);
   return (
     <li className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50 relative">
       <div className="absolute top-3 right-3 flex items-center gap-1">
@@ -38,7 +45,7 @@ export default function NoteCard({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onToggleImportant(note._id, !note.important);
+              onToggleImportant(id, !note.important);
             }}
             className="p-1.5 rounded focus:outline-none focus:ring-2 focus:ring-amber-500"
             title={note.important ? "Important" : "Mark as important"}
@@ -73,7 +80,7 @@ export default function NoteCard({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onTrash?.(note._id);
+              onTrash?.(id);
             }}
             className="p-1.5 rounded text-slate-400 hover:text-red-400 focus:outline-none focus:ring-2 focus:ring-red-500"
             title="Move to trash"

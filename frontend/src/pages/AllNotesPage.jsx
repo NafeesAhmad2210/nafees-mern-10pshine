@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { getNotes, updateNote, trashNote } from "../api.js";
 import NoteCard from "../components/NoteCard.jsx";
 import EditNoteModal from "../components/EditNoteModal.jsx";
 
 export default function AllNotesPage() {
+  const location = useLocation();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingNote, setEditingNote] = useState(null);
@@ -22,8 +24,8 @@ export default function AllNotesPage() {
   };
 
   useEffect(() => {
-    fetchNotes();
-  }, []);
+    if (location.pathname === "/all-notes") fetchNotes();
+  }, [location.pathname]);
 
   const idStr = (id) => (typeof id === "string" ? id : String(id));
 

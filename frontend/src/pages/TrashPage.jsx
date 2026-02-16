@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { getTrashedNotes, restoreNote, deleteNotePermanent } from "../api.js";
 
 export default function TrashPage() {
+  const location = useLocation();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,8 +23,8 @@ export default function TrashPage() {
   };
 
   useEffect(() => {
-    fetchNotes();
-  }, []);
+    if (location.pathname === "/trash") fetchNotes();
+  }, [location.pathname]);
 
   const idStr = (id) => (typeof id === "string" ? id : String(id));
 

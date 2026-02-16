@@ -43,7 +43,8 @@ router.post("/", async (req, res) => {
 
 router.patch("/:id", async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = (req.params.id || "").trim();
+    if (!id) return res.status(400).json({ error: "Note ID required" });
     const { title, content, important, trashed } = req.body;
     const update = {};
     if (typeof title === "string" && title.trim()) update.title = title.trim();
@@ -72,7 +73,8 @@ router.patch("/:id", async (req, res) => {
 // Permanently delete a note from database (used from Trash "Remove" button)
 router.delete("/:id", async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = (req.params.id || "").trim();
+    if (!id) return res.status(400).json({ error: "Note ID required" });
     const note = await Note.findOneAndDelete({ _id: id, userId: req.userId });
     if (!note) {
       return res.status(404).json({ error: "Note not found" });

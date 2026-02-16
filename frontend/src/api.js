@@ -125,8 +125,9 @@ export async function createNote(title, content, important) {
 }
 
 export async function updateNote(id, body) {
-  const noteId = typeof id === "string" ? id : String(id);
-  return apiFetch(`/api/notes/${noteId}`, {
+  const noteId = (id == null ? "" : String(id)).trim();
+  if (!noteId) throw new Error("Note ID required");
+  return apiFetch(`/api/notes/${encodeURIComponent(noteId)}`, {
     method: "PATCH",
     body: JSON.stringify(body),
   });
@@ -142,8 +143,9 @@ export async function restoreNote(id) {
 
 // Permanently delete a note from database
 export async function deleteNotePermanent(id) {
-  const noteId = typeof id === "string" ? id : String(id);
-  return apiFetch(`/api/notes/${noteId}`, {
+  const noteId = (id == null ? "" : String(id)).trim();
+  if (!noteId) throw new Error("Note ID required");
+  return apiFetch(`/api/notes/${encodeURIComponent(noteId)}`, {
     method: "DELETE",
   });
 }

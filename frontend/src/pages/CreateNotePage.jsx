@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { getNotes, createNote } from "../api.js";
 import EditNoteModal from "../components/EditNoteModal.jsx";
 import NoteCard from "../components/NoteCard.jsx";
 
 export default function CreateNotePage() {
+  const location = useLocation();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -22,8 +24,8 @@ export default function CreateNotePage() {
   };
 
   useEffect(() => {
-    fetchNotes();
-  }, []);
+    if (location.pathname === "/create-note") fetchNotes();
+  }, [location.pathname]);
 
   const handleSave = async (title, content, important) => {
     await createNote(title, content, important);
