@@ -84,14 +84,14 @@ This allows users to write well-structured and formatted notes.
 ## 🛠 Tech Stack
 
 Frontend:
-- React / React Native
+- Reactive
 
 Backend:
 - Node.js
 - Express.js
 
 Database:
-- MongoDB or PostgreSQL
+- MongoDB
 
 Authentication:
 - JWT or Session-based authentication
