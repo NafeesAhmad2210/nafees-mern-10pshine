@@ -4,6 +4,7 @@ import NoteCard from "../components/NoteCard.jsx";
 import EditNoteModal from "../components/EditNoteModal.jsx";
 
 export default function ImportantPage() {
+  const location = useLocation();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingNote, setEditingNote] = useState(null);

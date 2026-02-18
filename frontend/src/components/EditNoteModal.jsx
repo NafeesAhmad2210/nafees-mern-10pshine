@@ -14,9 +14,26 @@ export default function EditNoteModal({ isOpen, note, onClose, onSave }) {
       setImportant(Boolean(note.important));
       setError("");
     }
-  }, [note, isOpen]);
+  }, [note, isOpen, isCreate]);
 
-  if (!isOpen || !note) return null;
+  if (!isOpen) return null;
+
+  const syncContentFromEditor = () => {
+    if (editorRef.current) {
+      setContent(editorRef.current.innerHTML);
+    }
+  };
+
+  const applyFormat = (command) => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    try {
+      document.execCommand(command, false, null);
+      syncContentFromEditor();
+    } catch {
+      // ignore formatting errors
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,7 +92,8 @@ export default function EditNoteModal({ isOpen, note, onClose, onSave }) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Note title"
-              className="w-full px-4 py-2 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              dir="ltr"
+              className="w-full px-4 py-2 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 text-left"
             />
           </div>
           <div>

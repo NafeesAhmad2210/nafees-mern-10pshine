@@ -3,6 +3,7 @@ import { getTrashedNotes, restoreNote } from "../api.js";
 import NoteCard from "../components/NoteCard.jsx";
 
 export default function TrashPage() {
+  const location = useLocation();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -26,6 +27,7 @@ export default function TrashPage() {
   const idStr = (id) => (typeof id === "string" ? id : String(id));
 
   const handleRestore = async (id) => {
+    setError("");
     try {
       await restoreNote(id);
       setNotes((prev) => prev.filter((n) => idStr(n._id) !== idStr(id)));

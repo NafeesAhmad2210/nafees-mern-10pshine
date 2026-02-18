@@ -84,7 +84,7 @@ export default function CreateNotePage() {
           onClick={() => setModalOpen(true)}
           className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium mb-6"
         >
-          New note
+          + New note
         </button>
         <h2 className="text-lg font-semibold text-slate-200 mb-3">
           3 most recent notes
@@ -120,6 +120,7 @@ export default function CreateNotePage() {
       )}
       <CreateNoteModal
         isOpen={modalOpen}
+        note={null}
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
       />

@@ -19,7 +19,7 @@ export default function Signup() {
     }
     setLoading(true);
     try {
-      const { token } = await signup(name, email, password);
+      const { token, user } = await signup(name, email, password);
       setToken(token);
       navigate("/create-note", { replace: true });
     } catch (err) {
