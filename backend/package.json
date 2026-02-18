@@ -16,6 +16,7 @@
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2",
+    "nodemailer": "^6.9.16",
     "pino": "^9.4.0",
     "pino-pretty": "^11.3.0"
   },

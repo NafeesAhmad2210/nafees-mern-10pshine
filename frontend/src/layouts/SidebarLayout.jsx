@@ -1,7 +1,7 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { setToken } from "../api.js";
 
-function SidebarLayout() {
+export default function SidebarLayout() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -9,6 +9,7 @@ function SidebarLayout() {
     navigate("/login", { replace: true });
   };
 
+export default function SidebarLayout() {
   return (
     <div className="min-h-screen flex bg-slate-900">
       <aside className="w-56 shrink-0 border-r border-slate-700/50 bg-slate-800/30 flex flex-col">
@@ -28,7 +29,6 @@ function SidebarLayout() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -48,7 +48,6 @@ function SidebarLayout() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -68,7 +67,6 @@ function SidebarLayout() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -88,7 +86,6 @@ function SidebarLayout() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -101,9 +98,8 @@ function SidebarLayout() {
           </Link>
         </nav>
         <div className="mt-auto p-2 border-t border-slate-700/50">
-          <button
-            type="button"
-            onClick={handleLogout}
+          <Link
+            to="/profile"
             className="w-full px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-700/30 hover:text-slate-100 transition font-medium flex items-center gap-2"
           >
             <svg
@@ -111,17 +107,16 @@ function SidebarLayout() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-            Sign out
-          </button>
+            Profile
+          </Link>
         </div>
       </aside>
       <main className="flex-1 overflow-auto">
@@ -130,5 +125,3 @@ function SidebarLayout() {
     </div>
   );
 }
-
-export default SidebarLayout;

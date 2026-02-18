@@ -1,24 +1,54 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { login, setToken } from "../api.js";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { resetPassword } from "../api.js";
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function ResetPassword() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const email = location.state?.email || "";
+  const resetToken = location.state?.resetToken || "";
+
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setMessage("");
+
+    if (!resetToken) {
+      setError("Reset token is missing. Please restart the reset process.");
+      return;
+    }
+
+    if (!password || !confirmPassword) {
+      setError("Please enter and confirm your new password.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const { token, user } = await login(email, password);
-      setToken(token);
-      navigate("/create-note", { replace: true });
+      const res = await resetPassword(resetToken, password);
+      setMessage(res?.message || "Password has been reset.");
+      // After a short delay, send the user back to login
+      setTimeout(() => {
+        navigate("/login", { replace: true });
+      }, 1500);
     } catch (err) {
-      setError(err.message || "Login failed");
+      setError(err.message || "Failed to reset password.");
     } finally {
       setLoading(false);
     }
@@ -29,74 +59,73 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-700/50 p-8">
           <h1 className="text-2xl font-bold text-center text-slate-100 mb-2">
-            My Notes
+            Set new password
           </h1>
-          <p className="text-slate-400 text-center text-sm mb-8">
-            Sign in to your account
-          </p>
+          {email && (
+            <p className="text-slate-400 text-center text-sm mb-4">
+              For account: <span className="font-medium text-slate-100">{email}</span>
+            </p>
+          )}
           {error && (
             <p className="text-red-400 text-sm text-center mb-4 bg-red-900/30 rounded-lg py-2 px-3">
               {error}
             </p>
           )}
+          {message && (
+            <p className="text-emerald-400 text-sm text-center mb-4 bg-emerald-900/30 rounded-lg py-2 px-3">
+              {message}
+            </p>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
-                htmlFor="login-email"
+                htmlFor="new-password"
                 className="block text-sm font-medium text-slate-300 mb-2"
               >
-                Email
+                New password
               </label>
               <input
-                id="login-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="new-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="you@example.com"
+                placeholder="Enter new password"
                 className="w-full px-4 py-3 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
             <div>
               <label
-                htmlFor="login-password"
+                htmlFor="confirm-password"
                 className="block text-sm font-medium text-slate-300 mb-2"
               >
-                Password
+                Re-enter new password
               </label>
               <input
-                id="login-password"
+                id="confirm-password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                placeholder="••••••••"
+                placeholder="Re-enter new password"
                 className="w-full px-4 py-3 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
-              <div className="mt-2 text-right">
-                <Link
-                  to="/forgot-password"
-                  className="text-xs font-medium text-amber-400 hover:text-amber-300 focus:outline-none"
-                >
-                  Forgot password?
-                </Link>
-              </div>
             </div>
             <button
               type="submit"
               disabled={loading}
               className="w-full py-3 px-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold disabled:opacity-60"
             >
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? "Saving…" : "Save new password"}
             </button>
           </form>
           <p className="mt-6 text-center text-sm text-slate-400">
-            Don&apos;t have an account?{" "}
+            Back to{" "}
             <Link
-              to="/signup"
+              to="/login"
               className="text-amber-400 hover:text-amber-300 font-medium"
             >
-              Sign up
+              login
             </Link>
           </p>
         </div>
@@ -104,3 +133,4 @@ export default function Login() {
     </div>
   );
 }
+

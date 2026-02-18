@@ -18,7 +18,7 @@ export default function CreateNoteModal({ isOpen, onClose, onSave }) {
     }
     setLoading(true);
     try {
-      await onSave(title.trim(), content.trim(), important);
+      await onSave(title.trim(), (content || "").trim(), important);
       setTitle("");
       setContent("");
       setImportant(false);
