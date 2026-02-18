@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import CreateNoteModal from "../components/CreateNoteModal.jsx";
+import { getNotes, createNote } from "../api.js";
+import EditNoteModal from "../components/EditNoteModal.jsx";
 import NoteCard from "../components/NoteCard.jsx";
-import { getNotes, createNote, updateNote, trashNote } from "../api.js";
 
 export default function CreateNotePage() {
   const location = useLocation();
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,19 +55,38 @@ export default function CreateNotePage() {
 
   const recentNotes = notes.slice(0, 3);
 
+  const fetchNotes = async () => {
+    setLoading(true);
+    try {
+      const data = await getNotes();
+      const list = Array.isArray(data) ? data : (data?.notes ?? []);
+      setNotes(list.filter((n) => !n.trashed).slice(0, 3));
+    } catch {
+      setNotes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (location.pathname === "/create-note") fetchNotes();
+  }, [location.pathname]);
+
+  const handleSave = async (title, content, important) => {
+    await createNote(title, content, important);
+    await fetchNotes();
+  };
+
   return (
-    <div className="p-8">
-      <div className="max-w-2xl">
-        <h1 className="text-2xl font-bold text-slate-100 mb-2">Create note</h1>
-        <p className="text-slate-400 mb-6">
-          Add a new note. Notes are saved to your account.
-        </p>
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-slate-100">Create note</h1>
         <button
           type="button"
           onClick={() => setModalOpen(true)}
           className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium mb-6"
         >
-          New note
+          + New note
         </button>
         <h2 className="text-lg font-semibold text-slate-200 mb-3">
           3 most recent notes
@@ -88,10 +109,25 @@ export default function CreateNotePage() {
           </ul>
         )}
       </div>
-      <CreateNoteModal
+      <h2 className="text-lg font-semibold text-slate-200 mb-3">
+        Recent notes
+      </h2>
+      {loading ? (
+        <p className="text-slate-400">Loading…</p>
+      ) : notes.length === 0 ? (
+        <p className="text-slate-400">No notes yet. Create one above.</p>
+      ) : (
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {notes.map((note) => (
+            <NoteCard key={note._id} note={note} showContentFull={false} />
+          ))}
+        </ul>
+      )}
+      <EditNoteModal
         isOpen={modalOpen}
+        note={null}
         onClose={() => setModalOpen(false)}
-        onSave={handleSaveNote}
+        onSave={handleSave}
       />
     </div>
   );

@@ -7,6 +7,25 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
+const USER_KEY = "user";
+
+export function setUser(user) {
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(USER_KEY);
+  }
+}
+
+export function getUser() {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 async function apiFetch(path, options = {}) {
   const url = path.startsWith("http")
     ? path
@@ -17,8 +36,16 @@ async function apiFetch(path, options = {}) {
     ...options.headers,
   };
   const res = await fetch(url, { ...options, headers });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || "Request failed");
+  // Handle 204 No Content or empty responses
+  const data = res.status === 204 ? {} : await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const errorMsg =
+      data?.error ||
+      data?.message ||
+      res.statusText ||
+      `Request failed (${res.status})`;
+    throw new Error(errorMsg);
+  }
   return data;
 }
 
@@ -36,9 +63,38 @@ export async function login(email, password) {
   });
 }
 
+export async function getMe() {
+  return apiFetch("/api/auth/me");
+}
+
+export async function requestPasswordReset(email) {
+  return apiFetch("/api/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function verifyOtp(email, otp) {
+  return apiFetch("/api/auth/verify-otp", {
+    method: "POST",
+    body: JSON.stringify({ email, otp }),
+  });
+}
+
+export async function resetPassword(token, password) {
+  return apiFetch("/api/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ token, password }),
+  });
+}
+
 export function setToken(token) {
-  if (token) localStorage.setItem("token", token);
-  else localStorage.removeItem("token");
+  if (token) {
+    localStorage.setItem("token", token);
+  } else {
+    localStorage.removeItem("token");
+    setUser(null);
+  }
 }
 
 export function isAuthenticated() {
@@ -69,8 +125,9 @@ export async function createNote(title, content, important) {
 }
 
 export async function updateNote(id, body) {
-  const noteId = typeof id === "string" ? id : String(id);
-  return apiFetch(`/api/notes/${noteId}`, {
+  const noteId = (id == null ? "" : String(id)).trim();
+  if (!noteId) throw new Error("Note ID required");
+  return apiFetch(`/api/notes/${encodeURIComponent(noteId)}`, {
     method: "PATCH",
     body: JSON.stringify(body),
   });
@@ -82,4 +139,13 @@ export async function trashNote(id) {
 
 export async function restoreNote(id) {
   return updateNote(id, { trashed: false });
+}
+
+// Permanently delete a note from database
+export async function deleteNotePermanent(id) {
+  const noteId = (id == null ? "" : String(id)).trim();
+  if (!noteId) throw new Error("Note ID required");
+  return apiFetch(`/api/notes/${encodeURIComponent(noteId)}`, {
+    method: "DELETE",
+  });
 }
