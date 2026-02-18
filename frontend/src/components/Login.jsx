@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login, setToken, setUser } from "../api.js";
+import { login, setToken } from "../api.js";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -16,7 +16,6 @@ export default function Login() {
     try {
       const { token, user } = await login(email, password);
       setToken(token);
-      if (user) setUser(user);
       navigate("/create-note", { replace: true });
     } catch (err) {
       setError(err.message || "Login failed");

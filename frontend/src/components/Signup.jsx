@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signup, setToken, setUser } from "../api.js";
+import { signup, setToken } from "../api.js";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -21,7 +21,6 @@ export default function Signup() {
     try {
       const { token, user } = await signup(name, email, password);
       setToken(token);
-      if (user) setUser(user);
       navigate("/create-note", { replace: true });
     } catch (err) {
       setError(err.message || "Sign up failed");

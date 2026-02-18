@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { getNotes, createNote } from "../api.js";
-import EditNoteModal from "../components/EditNoteModal.jsx";
+import CreateNoteModal from "../components/CreateNoteModal.jsx";
 import NoteCard from "../components/NoteCard.jsx";
 
 export default function CreateNotePage() {
-  const location = useLocation();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -69,8 +67,8 @@ export default function CreateNotePage() {
   };
 
   useEffect(() => {
-    if (location.pathname === "/create-note") fetchNotes();
-  }, [location.pathname]);
+    fetchNotes();
+  }, []);
 
   const handleSave = async (title, content, important) => {
     await createNote(title, content, important);
@@ -109,9 +107,6 @@ export default function CreateNotePage() {
           </ul>
         )}
       </div>
-      <h2 className="text-lg font-semibold text-slate-200 mb-3">
-        Recent notes
-      </h2>
       {loading ? (
         <p className="text-slate-400">Loading…</p>
       ) : notes.length === 0 ? (
@@ -123,7 +118,7 @@ export default function CreateNotePage() {
           ))}
         </ul>
       )}
-      <EditNoteModal
+      <CreateNoteModal
         isOpen={modalOpen}
         note={null}
         onClose={() => setModalOpen(false)}

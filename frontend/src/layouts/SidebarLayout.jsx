@@ -1,4 +1,13 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { setToken } from "../api.js";
+
+export default function SidebarLayout() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setToken(null);
+    navigate("/login", { replace: true });
+  };
 
 export default function SidebarLayout() {
   return (

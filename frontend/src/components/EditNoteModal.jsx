@@ -1,31 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 export default function EditNoteModal({ isOpen, note, onClose, onSave }) {
-  const isCreate = note == null;
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [important, setImportant] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const editorRef = useRef(null);
 
   useEffect(() => {
-    if (isCreate) {
-      if (isOpen) {
-        setTitle("");
-        setContent("");
-        setImportant(false);
-        setError("");
-        if (editorRef.current) editorRef.current.innerHTML = "";
-      }
-    } else {
+    if (note) {
       setTitle(note.title || "");
       setContent(note.content || "");
       setImportant(Boolean(note.important));
       setError("");
-      if (editorRef.current) {
-        editorRef.current.innerHTML = note.content || "";
-      }
     }
   }, [note, isOpen, isCreate]);
 
@@ -57,20 +44,12 @@ export default function EditNoteModal({ isOpen, note, onClose, onSave }) {
     }
     setLoading(true);
     try {
-      if (isCreate) {
-        await onSave(title.trim(), (content || "").trim(), important);
-        setTitle("");
-        setContent("");
-        setImportant(false);
-        if (editorRef.current) editorRef.current.innerHTML = "";
-      } else {
-        await onSave(
-          String(note._id),
-          title.trim(),
-          (content || "").trim(),
-          important,
-        );
-      }
+      await onSave(
+        String(note._id),
+        title.trim(),
+        (content || "").trim(),
+        important
+      );
       onClose();
     } catch (err) {
       setError(err.message || "Failed to save note");
@@ -81,12 +60,6 @@ export default function EditNoteModal({ isOpen, note, onClose, onSave }) {
 
   const handleClose = () => {
     setError("");
-    if (isCreate) {
-      setTitle("");
-      setContent("");
-      setImportant(false);
-      if (editorRef.current) editorRef.current.innerHTML = "";
-    }
     onClose();
   };
 
@@ -99,9 +72,7 @@ export default function EditNoteModal({ isOpen, note, onClose, onSave }) {
         className="bg-slate-800 rounded-2xl shadow-xl border border-slate-700/50 w-full max-w-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-semibold text-slate-100 mb-4">
-          {isCreate ? "New note" : "Edit note"}
-        </h2>
+        <h2 className="text-lg font-semibold text-slate-100 mb-4">Edit note</h2>
         {error && (
           <p className="text-red-400 text-sm mb-4 bg-red-900/30 rounded-lg py-2 px-3">
             {error}
@@ -132,65 +103,14 @@ export default function EditNoteModal({ isOpen, note, onClose, onSave }) {
             >
               Content
             </label>
-            <div className="bg-slate-700/50 border border-slate-600 rounded-lg">
-              {/* Toolbar */}
-              <div className="flex items-center gap-1 border-b border-slate-600 px-2 py-1 text-xs text-slate-200">
-                <button
-                  type="button"
-                  onClick={() => applyFormat("bold")}
-                  className="px-1.5 py-0.5 rounded hover:bg-slate-600 font-semibold"
-                  title="Bold"
-                >
-                  B
-                </button>
-                <button
-                  type="button"
-                  onClick={() => applyFormat("italic")}
-                  className="px-1.5 py-0.5 rounded hover:bg-slate-600 italic"
-                  title="Italic"
-                >
-                  I
-                </button>
-                <button
-                  type="button"
-                  onClick={() => applyFormat("underline")}
-                  className="px-1.5 py-0.5 rounded hover:bg-slate-600 underline"
-                  title="Underline"
-                >
-                  U
-                </button>
-                <span className="mx-1 h-4 w-px bg-slate-600" />
-                <button
-                  type="button"
-                  onClick={() => applyFormat("insertOrderedList")}
-                  className="px-1.5 py-0.5 rounded hover:bg-slate-600"
-                  title="Numbered list"
-                >
-                  1.
-                </button>
-                <button
-                  type="button"
-                  onClick={() => applyFormat("insertUnorderedList")}
-                  className="px-1.5 py-0.5 rounded hover:bg-slate-600"
-                  title="Bulleted list"
-                >
-                  •
-                </button>
-                {/* Clean button removed as requested */}
-              </div>
-              {/* Editable content area */}
-              <div
-                id="edit-note-content"
-                ref={editorRef}
-                contentEditable
-                onInput={syncContentFromEditor}
-                dir="ltr"
-                style={{ direction: "ltr", textAlign: "left" }}
-                className="rich-editor px-3 py-2 min-h-[120px] max-h-80 overflow-y-auto outline-none text-slate-100 text-sm text-left"
-                placeholder="Note content (optional)"
-                suppressContentEditableWarning
-              />
-            </div>
+            <textarea
+              id="edit-note-content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Note content (optional)"
+              rows={4}
+              className="w-full px-4 py-2 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+            />
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -233,7 +153,7 @@ export default function EditNoteModal({ isOpen, note, onClose, onSave }) {
               disabled={loading}
               className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium disabled:opacity-60"
             >
-              {loading ? "Saving…" : isCreate ? "Save note" : "Save"}
+              {loading ? "Saving…" : "Save"}
             </button>
             <button
               type="button"
